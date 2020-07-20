@@ -156,7 +156,6 @@ class Version(object, metaclass=abc.ABCMeta):
         self.raining = False
 
         self.send_respawn()
-        self.send_chunk()
 
     def next_chunk(self):
         if len(config.chunks[self.version_name]) > 1:
