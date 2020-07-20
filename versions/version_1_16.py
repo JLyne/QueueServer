@@ -27,15 +27,16 @@ class Version_1_16(Version):
                         'piglin_safe': TagByte(0),
                         'logical_height': TagInt(255),
                         'infiniburn': TagString("minecraft:infiniburn_end"),
-                    })
+                    }),
                 ])
             })
         })
 
         self.protocol.send_packet("join_game",
                          self.protocol.buff_type.pack("iBB", 0, 1, 1),
-                         self.protocol.buff_type.pack_varint(1),
+                         self.protocol.buff_type.pack_varint(2),
                          self.protocol.buff_type.pack_string("rtgame:queue"),
+                         self.protocol.buff_type.pack_string("rtgame:reset"),
                          self.protocol.buff_type.pack_nbt(codec),
                          self.protocol.buff_type.pack_string("minecraft:overworld"),
                          self.protocol.buff_type.pack_string("rtgame:queue"),
@@ -44,6 +45,12 @@ class Version_1_16(Version):
                          self.protocol.buff_type.pack("????", False, True, False, False))
 
     def send_respawn(self):
+        self.protocol.send_packet("respawn",
+                                  self.protocol.buff_type.pack_string("minecraft:overworld"),
+                                  self.protocol.buff_type.pack_string("rtgame:reset"),
+                                  self.protocol.buff_type.pack("qBB", 0, 1, 1),
+                                  self.protocol.buff_type.pack("???", False, False, True))
+
         self.protocol.send_packet("respawn",
                                   self.protocol.buff_type.pack_string("minecraft:overworld"),
                                   self.protocol.buff_type.pack_string("rtgame:queue"),
