@@ -31,8 +31,8 @@ class Version_1_16_2(Version_1_16):
     })
     biomes = NBTFile(TagRoot({})).load('vanilla-biomes.nbt')
 
-    def __init__(self, protocol: Protocol):
-        super(Version_1_16_2, self).__init__(protocol)
+    def __init__(self, protocol: Protocol, bedrock: False):
+        super(Version_1_16_2, self).__init__(protocol, bedrock)
         self.version_name = '1.16.2'
 
     def send_join_game(self):

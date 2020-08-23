@@ -11,7 +11,7 @@ from voting import entry_json, entry_navigation_json
 
 
 class Version(object, metaclass=abc.ABCMeta):
-    def __init__(self, protocol: Protocol):
+    def __init__(self, protocol: Protocol, bedrock: False):
         self.protocol = protocol
         self.uuid = UUID.from_offline_player('NotKatuen')
         self.viewpoint_id = 999
@@ -27,6 +27,7 @@ class Version(object, metaclass=abc.ABCMeta):
         self.last_click = time.time()
 
         self.version_name = None
+        self.is_bedrock = bedrock
 
     def player_joined(self):
         self.send_join_game()
@@ -102,12 +103,15 @@ class Version(object, metaclass=abc.ABCMeta):
         viewpoint =  self.current_chunk.viewpoints[self.current_viewpoint]
         x = viewpoint.get('x')
         z = viewpoint.get('z')
+        y = viewpoint.get('y')
 
         # Player hasn't spawned yet
         # Spawn them outside chunk to prevent movement
         if self.player_spawned is False:
                 self.protocol.send_packet("player_position_and_look",
-                             self.protocol.buff_type.pack("dddff?", 128.0, 128, -128, 0.0, 0.0, 0b00000),
+                             self.protocol.buff_type.pack("dddff?", x, y, z,
+                                                          viewpoint.get('yaw_256'),
+                                                          viewpoint.get('pitch'), 0b00000),
                                     self.protocol.buff_type.pack_varint(0))
 
                 self.player_spawned = True
