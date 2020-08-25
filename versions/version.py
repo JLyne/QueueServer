@@ -57,6 +57,9 @@ class Version(object, metaclass=abc.ABCMeta):
     def packet_animation(self, buff):
         buff.unpack_varint()
 
+        if self.is_bedrock:
+            return
+
         now = time.time()
 
         # Prevent spam
@@ -82,12 +85,10 @@ class Version(object, metaclass=abc.ABCMeta):
             self.protocol.send_packet('change_game_state', self.protocol.buff_type.pack("Bf", 1, 0))
             self.raining = False
 
-        # Time of day
-        self.protocol.send_packet('time_update',
-                         self.protocol.buff_type.pack("Qq", 0,
-                                             # Cycle
-                                             self.current_chunk.time  if self.current_chunk.cycle is True
-                                             else (0 - self.current_chunk.time)))
+        if self.is_bedrock: # Current versions of geyser seem to ignore the time sometimes. Send repeatedly for now.
+            self.protocol.ticker.add_loop(100, self.send_time)
+        else:
+            self.send_time()
 
         if voting_mode:
             self.send_chat_message(entry_json(
@@ -96,7 +97,7 @@ class Version(object, metaclass=abc.ABCMeta):
         # Credits
         self.send_chat_message(self.current_chunk.credit_json())
 
-        if voting_mode:
+        if voting_mode and not self.is_bedrock:
             self.send_chat_message(entry_navigation_json(self.uuid, voting_secret))
 
     def send_viewpoint(self):
@@ -115,6 +116,9 @@ class Version(object, metaclass=abc.ABCMeta):
                                     self.protocol.buff_type.pack_varint(0))
 
                 self.player_spawned = True
+
+        if self.is_bedrock:
+            return
 
         # Teleport and spectate viewpoint entity
         if self.viewpoint_spawned is False:
@@ -139,7 +143,18 @@ class Version(object, metaclass=abc.ABCMeta):
             self.protocol.send_packet('camera', self.protocol.buff_type.pack_varint(self.viewpoint_id))
             self.viewpoint_used = True
 
+    def send_time(self):
+        # Time of day
+        self.protocol.send_packet('time_update',
+                         self.protocol.buff_type.pack("Qq", 0,
+                                             # Cycle
+                                             self.current_chunk.time  if self.current_chunk.cycle is True
+                                             else (0 - self.current_chunk.time)))
+
     def next_viewpoint(self):
+        if self.is_bedrock:
+            return
+
         count = len(self.current_chunk.viewpoints)
 
         if count is 0:
