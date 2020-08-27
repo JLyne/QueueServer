@@ -3,6 +3,7 @@ import json
 import random
 import time
 
+from quarry.types.nbt import TagRoot, TagCompound
 from quarry.types.uuid import UUID
 
 import config
@@ -40,6 +41,7 @@ class Version(object, metaclass=abc.ABCMeta):
         self.protocol.ticker.add_loop(100, self.send_keep_alive)  # Keep alive packets
         self.protocol.ticker.add_delay(10, self.send_tablist)
 
+        self.send_inventory()
         self.send_chunk()
 
     # Handle /next and /orev commands in voting mode
@@ -68,6 +70,24 @@ class Version(object, metaclass=abc.ABCMeta):
             self.next_viewpoint()
 
     def send_chunk(self):
+        # Clear geyser chunk cache from previous server
+        if self.is_bedrock:
+            data = [
+                self.protocol.buff_type.pack_varint(0),
+                self.protocol.buff_type.pack_nbt(TagRoot({'': TagCompound({})})),
+                self.protocol.buff_type.pack_varint(1024),
+            ]
+
+            for i in range(0, 1024):
+                data.append(self.protocol.buff_type.pack_varint(127))
+
+            data.append(self.protocol.buff_type.pack_varint(0))
+            data.append(self.protocol.buff_type.pack_varint(0))
+
+            for x in range(-8, 8):
+                for y in range(-8, 8):
+                    self.protocol.send_packet("chunk_data", self.protocol.buff_type.pack("ii?", x, y, True), *data)
+
         self.current_viewpoint = 0
         self.send_viewpoint()
 
@@ -236,3 +256,7 @@ class Version(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def send_chat_message(self, message):
         raise NotImplementedError('users must define send_chat_message to use this base class')
+
+    @abc.abstractmethod
+    def send_inventory(self):
+        raise NotImplementedError('users must define send_inventory to use this base class')

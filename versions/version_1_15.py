@@ -36,3 +36,13 @@ class Version_1_15(Version):
         self.protocol.send_packet('chat_message',
                                       self.protocol.buff_type.pack_string(message),
                                       self.protocol.buff_type.pack("b", 1))
+
+    def send_inventory(self):
+        data = [
+            self.protocol.buff_type.pack('Bh', 0, 46)
+        ]
+
+        for i in range(0, 46):
+            data.append(self.protocol.buff_type.pack('?', False))
+
+        self.protocol.send_packet('window_items', *data)
