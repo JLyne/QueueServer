@@ -61,7 +61,7 @@ class Version_1_16(Version_1_15):
         self.protocol.send_packet(
                 'spawn_mob',
                 self.protocol.buff_type.pack_varint(self.viewpoint_id),
-                self.protocol.buff_type.pack_uuid(self.uuid),
+                self.protocol.buff_type.pack_uuid(self.protocol.uuid),
                 self.protocol.buff_type.pack_varint(68),
                 self.protocol.buff_type.pack("dddbbbhhh",
                                     viewpoint.get('x'),
