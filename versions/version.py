@@ -129,7 +129,7 @@ class Version(object, metaclass=abc.ABCMeta):
         # Spawn them outside chunk to prevent movement
         if self.player_spawned is False:
                 self.protocol.send_packet("player_position_and_look",
-                             self.protocol.buff_type.pack("dddff?", x, y, z,
+                             self.protocol.buff_type.pack("dddff?", 16, 64, -16,
                                                           viewpoint.get('yaw_256'),
                                                           viewpoint.get('pitch'), 0b00000),
                                     self.protocol.buff_type.pack_varint(0))
