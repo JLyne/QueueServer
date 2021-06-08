@@ -6,7 +6,11 @@ from chunk import Chunk
 
 import yaml
 
+from queueserver import stderrLogger
+
 logger = logging.getLogger('config')
+logger.addHandler(stderrLogger)
+logger.setLevel(logging.INFO)
 
 chunks = {
     '1.15': [],
@@ -27,13 +31,13 @@ def load_chunk_config():
             viewpoints = entry.get('viewpoints', list())
 
             if folder is None:
-                logger.error('Entry %s has no folder defined. Skipped.', name)
+                logger.error('Entry %s has no folder defined. Skipped.'.format(name))
                 continue
 
             folder_path = os.path.join(os.getcwd(), 'packets', folder)
 
             if os.path.exists(folder_path) is False:
-                logger.error('Folder for entry %s does not exist. Skipped.', name)
+                logger.error('Folder for entry {} does not exist. Skipped.'.format(name))
                 continue
 
             for subfolder in glob.glob(os.path.join(folder_path, '*/')):
@@ -41,7 +45,7 @@ def load_chunk_config():
 
                 if chunks.get(version) is not None:
                     chunk = Chunk(name, contributors, environment, folder, version, viewpoints)
-                    logger.info('Loaded {} for version {}', chunk.name, version)
+                    logger.info('Loaded {} for version {}'.format(chunk.name, version))
 
                     chunks[version].append(chunk)
 

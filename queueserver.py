@@ -16,6 +16,10 @@ from prometheus import set_players_online, init_prometheus
 voting_mode = False
 voting_secret = None
 
+logging.basicConfig(filename="queueserver.log")
+stderrLogger = logging.StreamHandler()
+stderrLogger.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
+
 class Protocol(ServerProtocol):
     def __init__(self, factory, remote_addr):
         from versions import Version_1_15, Version_1_16, Version_1_16_2, Version_1_17
