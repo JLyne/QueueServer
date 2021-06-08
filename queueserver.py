@@ -18,7 +18,7 @@ voting_secret = None
 
 class Protocol(ServerProtocol):
     def __init__(self, factory, remote_addr):
-        from versions import Version_1_15, Version_1_16, Version_1_16_2
+        from versions import Version_1_15, Version_1_16, Version_1_16_2, Version_1_17
         self.uuid = UUID.from_offline_player('NotKatuen')
 
         self.forwarded_uuid = None
@@ -28,7 +28,8 @@ class Protocol(ServerProtocol):
         self.versions = {
             578 : Version_1_15,
             736 : Version_1_16,
-            751 : Version_1_16_2
+            751 : Version_1_16_2,
+            755 : Version_1_17
         }
 
         super(Protocol, self).__init__(factory, remote_addr)

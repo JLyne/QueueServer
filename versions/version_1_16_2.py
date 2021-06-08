@@ -1,39 +1,45 @@
-from quarry.types.nbt import TagList, TagCompound, TagRoot, TagString, TagByte, TagFloat, TagLong, TagInt, NBTFile
+from quarry.types.nbt import TagList, TagCompound, TagRoot, TagString, TagByte, TagFloat, TagInt, NBTFile
 from quarry.types.uuid import UUID
 
 from versions import Version_1_16
 from queueserver import Protocol
 
 class Version_1_16_2(Version_1_16):
-    dimension_settings = {
-        'name': TagString("minecraft:overworld"),
-        'natural': TagByte(1),
-        'ambient_light': TagFloat(0.0),
-        'has_ceiling': TagByte(0),
-        'has_skylight': TagByte(1),
-        'ultrawarm': TagByte(0),
-        'has_raids': TagByte(0),
-        'respawn_anchor_works': TagByte(0),
-        'bed_works': TagByte(0),
-        'piglin_safe': TagByte(0),
-        'infiniburn': TagString("minecraft:infiniburn_overworld"),
-        "effects": TagString("minecraft:overworld"),
-        'logical_height': TagInt(256),
-        'coordinate_scale': TagFloat(1.0),
-    }
-    dimension = {
-        'name': TagString("minecraft:overworld"),
-        'id': TagInt(0),
-        'element': TagCompound(dimension_settings),
-    }
-    current_dimension = TagRoot({
-        '': TagCompound(dimension_settings),
-    })
-    biomes = NBTFile(TagRoot({})).load('vanilla-biomes.nbt')
-
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_16_2, self).__init__(protocol, bedrock)
         self.version_name = '1.16.2'
+
+        self.dimension_settings = self.get_dimension_settings()
+
+        self.dimension = {
+            'name': TagString("minecraft:overworld"),
+            'id': TagInt(0),
+            'element': TagCompound(self.dimension_settings),
+        }
+
+        self.current_dimension = TagRoot({
+            '': TagCompound(self.dimension_settings),
+        })
+
+        self.biomes = NBTFile(TagRoot({})).load('biomes.nbt')
+
+    def get_dimension_settings(self):
+        return {
+            'name': TagString("minecraft:overworld"),
+            'natural': TagByte(1),
+            'ambient_light': TagFloat(1.0),
+            'has_ceiling': TagByte(0),
+            'has_skylight': TagByte(1),
+            'ultrawarm': TagByte(0),
+            'has_raids': TagByte(0),
+            'respawn_anchor_works': TagByte(0),
+            'bed_works': TagByte(0),
+            'piglin_safe': TagByte(0),
+            'infiniburn': TagString("minecraft:infiniburn_overworld"),
+            "effects": TagString("minecraft:overworld"),
+            'logical_height': TagInt(256),
+            'coordinate_scale': TagFloat(1.0),
+        }
 
     def send_join_game(self):
         codec = TagRoot({

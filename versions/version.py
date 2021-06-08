@@ -15,6 +15,7 @@ class Version(object, metaclass=abc.ABCMeta):
     def __init__(self, protocol: Protocol, bedrock: False):
         self.protocol = protocol
         self.viewpoint_id = 999
+        self.viewpoint_uuid = UUID.random()
 
         self.current_chunk = None
         self.current_viewpoint = None
@@ -120,7 +121,7 @@ class Version(object, metaclass=abc.ABCMeta):
             self.send_chat_message(entry_navigation_json(self.protocol.uuid, voting_secret))
 
     def send_viewpoint(self):
-        viewpoint =  self.current_chunk.viewpoints[self.current_viewpoint]
+        viewpoint = self.current_chunk.viewpoints[self.current_viewpoint]
         x = viewpoint.get('x')
         z = viewpoint.get('z')
         y = viewpoint.get('y')
@@ -128,13 +129,8 @@ class Version(object, metaclass=abc.ABCMeta):
         # Player hasn't spawned yet
         # Spawn them outside chunk to prevent movement
         if self.player_spawned is False:
-                self.protocol.send_packet("player_position_and_look",
-                             self.protocol.buff_type.pack("dddff?", 16, 64, -16,
-                                                          viewpoint.get('yaw_256'),
-                                                          viewpoint.get('pitch'), 0b00000),
-                                    self.protocol.buff_type.pack_varint(0))
-
-                self.player_spawned = True
+            self.send_spawn()
+            self.player_spawned = True
 
         if self.is_bedrock:
             return
@@ -246,6 +242,10 @@ class Version(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def send_join_game(self):
         raise NotImplementedError('users must define send_join_game to use this base class')
+
+    @abc.abstractmethod
+    def send_spawn(self):
+        raise NotImplementedError('users must define send_spawn to use this base class')
 
     @abc.abstractmethod
     def send_respawn(self):

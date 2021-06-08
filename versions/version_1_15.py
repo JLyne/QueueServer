@@ -14,6 +14,11 @@ class Version_1_15(Version):
                          self.protocol.buff_type.pack_varint(16),
                          self.protocol.buff_type.pack("??", False, True))
 
+    def send_spawn(self):
+        self.protocol.send_packet("player_position_and_look",
+                                  self.protocol.buff_type.pack("dddff?", 16, 64, -16, 0, 0, 0b00000),
+                                  self.protocol.buff_type.pack_varint(0))
+
     def send_respawn(self):
         self.protocol.send_packet("respawn", self.protocol.buff_type.pack("iBq", 1, 0, 1), self.protocol.buff_type.pack_string("default"))
         self.protocol.send_packet("respawn", self.protocol.buff_type.pack("iBq", 0, 0, 1), self.protocol.buff_type.pack_string("default"))
