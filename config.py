@@ -2,6 +2,8 @@ import logging
 import os
 import glob
 
+from yaml import SafeLoader
+
 from chunk import Chunk
 
 import yaml
@@ -22,7 +24,7 @@ chunks = {
 
 def load_chunk_config():
     with open(r'config.yml') as file:
-        entries = yaml.load(file)
+        entries = yaml.load(file, Loader=SafeLoader)
 
         for entry in entries:
             name = entry.get('name', 'Untitled')
