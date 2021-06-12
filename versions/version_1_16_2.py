@@ -4,6 +4,7 @@ from quarry.types.uuid import UUID
 from versions import Version_1_16
 from queueserver import Protocol
 
+
 class Version_1_16_2(Version_1_16):
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_16_2, self).__init__(protocol, bedrock)
@@ -55,17 +56,17 @@ class Version_1_16_2(Version_1_16):
         })
 
         self.protocol.send_packet("join_game",
-                         self.protocol.buff_type.pack("i?BB", 0, False, 1, 1),
-                         self.protocol.buff_type.pack_varint(2),
-                         self.protocol.buff_type.pack_string("rtgame:queue"),
-                         self.protocol.buff_type.pack_string("rtgame:reset"),
-                         self.protocol.buff_type.pack_nbt(codec),
-                         self.protocol.buff_type.pack_nbt(self.current_dimension),
-                         self.protocol.buff_type.pack_string("rtgame:queue"),
-                         self.protocol.buff_type.pack("q", 0),
-                         self.protocol.buff_type.pack_varint(0),
-                         self.protocol.buff_type.pack_varint(32),
-                         self.protocol.buff_type.pack("????", False, True, False, False))
+                                  self.protocol.buff_type.pack("i?BB", 0, False, 1, 1),
+                                  self.protocol.buff_type.pack_varint(2),
+                                  self.protocol.buff_type.pack_string("rtgame:queue"),
+                                  self.protocol.buff_type.pack_string("rtgame:reset"),
+                                  self.protocol.buff_type.pack_nbt(codec),
+                                  self.protocol.buff_type.pack_nbt(self.current_dimension),
+                                  self.protocol.buff_type.pack_string("rtgame:queue"),
+                                  self.protocol.buff_type.pack("q", 0),
+                                  self.protocol.buff_type.pack_varint(0),
+                                  self.protocol.buff_type.pack_varint(32),
+                                  self.protocol.buff_type.pack("????", False, True, False, False))
 
     def send_respawn(self):
         self.protocol.send_packet("respawn",
@@ -87,15 +88,12 @@ class Version_1_16_2(Version_1_16):
                 self.protocol.buff_type.pack_uuid(self.protocol.uuid),
                 self.protocol.buff_type.pack_varint(69),
                 self.protocol.buff_type.pack("dddbbbhhh",
-                                    viewpoint.get('x'),
-                                    viewpoint.get('y'),
-                                    viewpoint.get('z'),
-                                    viewpoint.get('yaw_256'),
-                                    viewpoint.get('pitch'),
-                                    viewpoint.get('yaw_256'), 0, 0, 0))
+                                             viewpoint.get('x'), viewpoint.get('y'), viewpoint.get('z'),
+                                             viewpoint.get('yaw_256'), viewpoint.get('pitch'), viewpoint.get('yaw_256'),
+                                             0, 0, 0))
 
     def send_chat_message(self, message):
         self.protocol.send_packet('chat_message',
-                                      self.protocol.buff_type.pack_string(message),
-                                      self.protocol.buff_type.pack("b", 1),
-                                      self.protocol.buff_type.pack_uuid(UUID(int=0)))
+                                  self.protocol.buff_type.pack_string(message),
+                                  self.protocol.buff_type.pack("b", 1),
+                                  self.protocol.buff_type.pack_uuid(UUID(int=0)))

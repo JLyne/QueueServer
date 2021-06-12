@@ -19,6 +19,7 @@ chunks = {
     '1.17': [],
 }
 
+
 def load_chunk_config():
     with open(r'config.yml') as file:
         entries = yaml.load(file)

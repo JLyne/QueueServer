@@ -92,9 +92,8 @@ class Version(object, metaclass=abc.ABCMeta):
         self.send_viewpoint()
 
         # Chunk packets
-        for packet in  self.current_chunk.packets:
+        for packet in self.current_chunk.packets:
             self.protocol.send_packet(packet.get('type'), packet.get('packet'))
-
 
         # Start/stop rain as necessary
         if self.current_chunk.weather == 'rain':
@@ -105,15 +104,15 @@ class Version(object, metaclass=abc.ABCMeta):
             self.protocol.send_packet('change_game_state', self.protocol.buff_type.pack("Bf", 1, 0))
             self.raining = False
 
-        if self.is_bedrock: # Current versions of geyser seem to ignore the time sometimes. Send repeatedly for now.
+        if self.is_bedrock:  # Current versions of geyser seem to ignore the time sometimes. Send repeatedly for now.
             self.protocol.ticker.add_loop(100, self.send_time)
         else:
             self.send_time()
 
         if voting_mode:
             self.send_chat_message(entry_json(
-                                          config.chunks[self.version_name].index(self.current_chunk) + 1, len(
-                                          config.chunks[self.version_name])))
+                                          config.chunks[self.version_name].index(self.current_chunk) + 1,
+                                          len(config.chunks[self.version_name])))
         # Credits
         self.send_chat_message(self.current_chunk.credit_json())
 
@@ -140,19 +139,14 @@ class Version(object, metaclass=abc.ABCMeta):
             self.spawn_viewpoint_entity(viewpoint)
 
             self.viewpoint_spawned = True
-        else :
+        else:
             self.protocol.send_packet('entity_teleport', self.protocol.buff_type.pack_varint(self.viewpoint_id),
-                             self.protocol.buff_type.pack("dddbbb",
-                                    x,
-                                    viewpoint.get('y'),
-                                    z,
-                                    viewpoint.get('yaw_256'),
-                                    viewpoint.get('pitch'),
-                                    0))
+                                      self.protocol.buff_type.pack("dddbbb", x, y, z,
+                                                                   viewpoint.get('yaw_256'), viewpoint.get('pitch'), 0))
 
             self.protocol.send_packet('entity_head_look',
-                             self.protocol.buff_type.pack_varint(self.viewpoint_id),
-                             self.protocol.buff_type.pack("b", viewpoint.get('yaw_256')))
+                                      self.protocol.buff_type.pack_varint(self.viewpoint_id),
+                                      self.protocol.buff_type.pack("b", viewpoint.get('yaw_256')))
 
         if self.viewpoint_used is False:
             self.protocol.send_packet('camera', self.protocol.buff_type.pack_varint(self.viewpoint_id))
@@ -161,10 +155,10 @@ class Version(object, metaclass=abc.ABCMeta):
     def send_time(self):
         # Time of day
         self.protocol.send_packet('time_update',
-                         self.protocol.buff_type.pack("Qq", 0,
-                                             # Cycle
-                                             self.current_chunk.time  if self.current_chunk.cycle is True
-                                             else (0 - self.current_chunk.time)))
+                                  self.protocol.buff_type.pack("Qq", 0,
+                                                               self.current_chunk.time
+                                                               if self.current_chunk.cycle is True
+                                                               else (0 - self.current_chunk.time)))
 
     def next_viewpoint(self):
         if self.is_bedrock:
@@ -221,20 +215,20 @@ class Version(object, metaclass=abc.ABCMeta):
 
     def send_tablist(self):
         self.protocol.send_packet("player_list_header_footer",
-                         self.protocol.buff_type.pack_string(json.dumps({
-                            "text": "\n\ue300\n"
-                         })),
-                         self.protocol.buff_type.pack_string(json.dumps({"translate": ""})))
+                                  self.protocol.buff_type.pack_string(json.dumps({
+                                      "text": "\n\ue300\n"
+                                  })),
+                                  self.protocol.buff_type.pack_string(json.dumps({"translate": ""})))
 
         self.protocol.send_packet("player_list_item",
-                         self.protocol.buff_type.pack_varint(0),
-                         self.protocol.buff_type.pack_varint(1),
-                         self.protocol.buff_type.pack_uuid(self.protocol.uuid),
-                         self.protocol.buff_type.pack_string(self.protocol.display_name),
-                         self.protocol.buff_type.pack_varint(0),
-                         self.protocol.buff_type.pack_varint(1),
-                         self.protocol.buff_type.pack_varint(1),
-                         self.protocol.buff_type.pack_varint(0))
+                                  self.protocol.buff_type.pack_varint(0),
+                                  self.protocol.buff_type.pack_varint(1),
+                                  self.protocol.buff_type.pack_uuid(self.protocol.uuid),
+                                  self.protocol.buff_type.pack_string(self.protocol.display_name),
+                                  self.protocol.buff_type.pack_varint(0),
+                                  self.protocol.buff_type.pack_varint(1),
+                                  self.protocol.buff_type.pack_varint(1),
+                                  self.protocol.buff_type.pack_varint(0))
 
     def send_keep_alive(self):
         self.protocol.send_packet("keep_alive", self.protocol.buff_type.pack("Q", 0))
