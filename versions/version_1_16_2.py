@@ -81,16 +81,8 @@ class Version_1_16_2(Version_1_16):
                                   self.protocol.buff_type.pack("qBB", 0, 1, 1),
                                   self.protocol.buff_type.pack("???", False, False, True))
 
-    def spawn_viewpoint_entity(self, viewpoint):
-        self.protocol.send_packet(
-                'spawn_mob',
-                self.protocol.buff_type.pack_varint(self.viewpoint_id),
-                self.protocol.buff_type.pack_uuid(self.protocol.uuid),
-                self.protocol.buff_type.pack_varint(69),
-                self.protocol.buff_type.pack("dddbbbhhh",
-                                             viewpoint.get('x'), viewpoint.get('y'), viewpoint.get('z'),
-                                             viewpoint.get('yaw_256'), viewpoint.get('pitch'), viewpoint.get('yaw_256'),
-                                             0, 0, 0))
+    def get_viewpoint_entity_type(self):
+        return 69
 
     def send_chat_message(self, message):
         self.protocol.send_packet('chat_message',

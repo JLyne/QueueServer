@@ -1,9 +1,7 @@
 import abc
-import json
 import random
 import time
 
-from quarry.types.nbt import TagRoot, TagCompound
 from quarry.types.uuid import UUID
 
 import config
@@ -72,21 +70,7 @@ class Version(object, metaclass=abc.ABCMeta):
     def send_chunk(self):
         # Clear geyser chunk cache from previous server
         if self.is_bedrock:
-            data = [
-                self.protocol.buff_type.pack_varint(0),
-                self.protocol.buff_type.pack_nbt(TagRoot({'': TagCompound({})})),
-                self.protocol.buff_type.pack_varint(1024),
-            ]
-
-            for i in range(0, 1024):
-                data.append(self.protocol.buff_type.pack_varint(127))
-
-            data.append(self.protocol.buff_type.pack_varint(0))
-            data.append(self.protocol.buff_type.pack_varint(0))
-
-            for x in range(-8, 8):
-                for y in range(-8, 8):
-                    self.protocol.send_packet("chunk_data", self.protocol.buff_type.pack("ii?", x, y, True), *data)
+            self.send_reset_world()
 
         self.current_viewpoint = 0
         self.send_viewpoint()
@@ -96,13 +80,7 @@ class Version(object, metaclass=abc.ABCMeta):
             self.protocol.send_packet(packet.get('type'), packet.get('packet'))
 
         # Start/stop rain as necessary
-        if self.current_chunk.weather == 'rain':
-            if self.raining is False:
-                self.protocol.send_packet('change_game_state', self.protocol.buff_type.pack("Bf", 2, 0))
-                self.raining = True
-        elif self.raining is True:
-            self.protocol.send_packet('change_game_state', self.protocol.buff_type.pack("Bf", 1, 0))
-            self.raining = False
+        self.send_weather(self.current_chunk.weather == 'rain')
 
         if self.is_bedrock:  # Current versions of geyser seem to ignore the time sometimes. Send repeatedly for now.
             self.protocol.ticker.add_loop(100, self.send_time)
@@ -151,14 +129,6 @@ class Version(object, metaclass=abc.ABCMeta):
         if self.viewpoint_used is False:
             self.protocol.send_packet('camera', self.protocol.buff_type.pack_varint(self.viewpoint_id))
             self.viewpoint_used = True
-
-    def send_time(self):
-        # Time of day
-        self.protocol.send_packet('time_update',
-                                  self.protocol.buff_type.pack("Qq", 0,
-                                                               self.current_chunk.time
-                                                               if self.current_chunk.cycle is True
-                                                               else (0 - self.current_chunk.time)))
 
     def next_viewpoint(self):
         if self.is_bedrock:
@@ -213,46 +183,50 @@ class Version(object, metaclass=abc.ABCMeta):
         self.reset_chunk()
         self.send_chunk()
 
-    def send_tablist(self):
-        self.protocol.send_packet("player_list_header_footer",
-                                  self.protocol.buff_type.pack_string(json.dumps({
-                                      "text": "\n\ue300\n"
-                                  })),
-                                  self.protocol.buff_type.pack_string(json.dumps({"translate": ""})))
-
-        self.protocol.send_packet("player_list_item",
-                                  self.protocol.buff_type.pack_varint(0),
-                                  self.protocol.buff_type.pack_varint(1),
-                                  self.protocol.buff_type.pack_uuid(self.protocol.uuid),
-                                  self.protocol.buff_type.pack_string(self.protocol.display_name),
-                                  self.protocol.buff_type.pack_varint(0),
-                                  self.protocol.buff_type.pack_varint(1),
-                                  self.protocol.buff_type.pack_varint(1),
-                                  self.protocol.buff_type.pack_varint(0))
-
-    def send_keep_alive(self):
-        self.protocol.send_packet("keep_alive", self.protocol.buff_type.pack("Q", 0))
-
     @abc.abstractmethod
     def send_join_game(self):
-        raise NotImplementedError('users must define send_join_game to use this base class')
+        raise NotImplementedError('send_join_game must be defined to use this base class')
 
     @abc.abstractmethod
     def send_spawn(self):
-        raise NotImplementedError('users must define send_spawn to use this base class')
+        raise NotImplementedError('send_spawn must be defined to use this base class')
 
     @abc.abstractmethod
     def send_respawn(self):
-        raise NotImplementedError('users must define send_respawn to use this base class')
+        raise NotImplementedError('send_respawn must be defined to use this base class')
+
+    @abc.abstractmethod
+    def send_reset_world(self):
+        raise NotImplementedError('send_reset_world must be defined to use this base class')
+
+    @abc.abstractmethod
+    def send_keep_alive(self):
+        raise NotImplementedError('send_keep_alive must be defined to use this base class')
 
     @abc.abstractmethod
     def spawn_viewpoint_entity(self, viewpoint):
-        raise NotImplementedError('users must define spawn_viewpoint_entity to use this base class')
+        raise NotImplementedError('spawn_viewpoint_entity must be defined to use this base class')
+
+    @abc.abstractmethod
+    def get_viewpoint_entity_type(self):
+        raise NotImplementedError('get_viewpoint_entity_type must be defined to use this base class')
+
+    @abc.abstractmethod
+    def send_time(self):
+        raise NotImplementedError('send_time must be defined to use this base class')
+
+    @abc.abstractmethod
+    def send_weather(self, rain=False):
+        raise NotImplementedError('send_weather must be defined to use this base class')
 
     @abc.abstractmethod
     def send_chat_message(self, message):
-        raise NotImplementedError('users must define send_chat_message to use this base class')
+        raise NotImplementedError('send_chat_message must be defined to use this base class')
+
+    @abc.abstractmethod
+    def send_tablist(self):
+        raise NotImplementedError('send_tablist must be defined to use this base class')
 
     @abc.abstractmethod
     def send_inventory(self):
-        raise NotImplementedError('users must define send_inventory to use this base class')
+        raise NotImplementedError('send_inventory must be defined to use this base class')

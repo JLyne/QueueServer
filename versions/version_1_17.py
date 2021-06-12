@@ -17,15 +17,8 @@ class Version_1_17(Version_1_16_2):
 
         return settings
 
-    def spawn_viewpoint_entity(self, viewpoint):
-        self.protocol.send_packet(
-                'spawn_mob',
-                self.protocol.buff_type.pack_varint(self.viewpoint_id),
-                self.protocol.buff_type.pack_uuid(self.viewpoint_uuid),
-                self.protocol.buff_type.pack_varint(74),
-                self.protocol.buff_type.pack("dddbbbhhh", viewpoint.get('x'), viewpoint.get('y'), viewpoint.get('z'),
-                                             viewpoint.get('yaw_256'), viewpoint.get('pitch'), viewpoint.get('yaw_256'),
-                                             0, 0, 0))
+    def get_viewpoint_entity_type(self):
+        return 74
 
     def send_spawn(self):
         self.protocol.send_packet("player_position_and_look",
