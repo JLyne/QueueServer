@@ -48,7 +48,7 @@ class Chunk:
                 "pitch": int(float(parts[4])),
             })
 
-        if len(self.viewpoints) is 0:
+        if len(self.viewpoints) == 0:
             self.viewpoints.append({
                 "x": 0.0,
                 "y": 0.0,
@@ -60,7 +60,7 @@ class Chunk:
 
     def credit_string(self):
         contributors = ", ".join(self.contributors[0:-2])
-        contributors += self.contributors[-1] if len(self.contributors) is 1 else "and " + self.contributors[-1]
+        contributors += self.contributors[-1] if len(self.contributors) == 1 else "and " + self.contributors[-1]
 
         return self.name + " by " + contributors
 
@@ -80,7 +80,7 @@ class Chunk:
                     "color": "yellow"
                 },
                 {
-                    "text": self.contributors[-1] if len(self.contributors) is 1 else "and " + self.contributors[-1],
+                    "text": self.contributors[-1] if len(self.contributors) == 1 else "and " + self.contributors[-1],
                     "italic": False,
                     "color": "yellow"
                 }

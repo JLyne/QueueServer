@@ -136,7 +136,7 @@ class Version(object, metaclass=abc.ABCMeta):
 
         count = len(self.current_chunk.viewpoints)
 
-        if count is 0:
+        if count == 0:
             return
         elif self.current_viewpoint < count - 1:
             self.current_viewpoint += 1
