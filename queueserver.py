@@ -21,7 +21,7 @@ stderrLogger.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
 class Protocol(ServerProtocol):
     def __init__(self, factory, remote_addr):
         from versions import Version_1_15, Version_1_16, Version_1_16_2, Version_1_17
-        self.uuid = UUID.from_offline_player('NotKatuen')
+        self.uuid = UUID.random()
 
         self.forwarded_uuid = None
         self.forwarded_host = None

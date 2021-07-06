@@ -1,6 +1,7 @@
 import json
 
 from quarry.types.nbt import TagRoot, TagCompound
+from quarry.types.uuid import UUID
 
 from versions import Version
 
@@ -54,7 +55,7 @@ class Version_1_15(Version):
         self.protocol.send_packet(
                 'spawn_mob',
                 self.protocol.buff_type.pack_varint(self.viewpoint_id),
-                self.protocol.buff_type.pack_uuid(self.protocol.uuid),
+                self.protocol.buff_type.pack_uuid(UUID.random()),
                 self.protocol.buff_type.pack_varint(self.get_viewpoint_entity_type()),
                 self.protocol.buff_type.pack("dddbbbhhh",
                                              viewpoint.get('x'),
