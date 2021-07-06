@@ -1,4 +1,7 @@
 import logging
+import os
+import sys
+
 from argparse import ArgumentParser
 from copy import deepcopy
 
@@ -7,20 +10,34 @@ from quarry.net.server import ServerFactory, ServerProtocol
 
 from quarry.types.uuid import UUID
 
-import config
-from prometheus import set_players_online, init_prometheus
+from queueserver.prometheus import set_players_online, init_prometheus
+from queueserver.config import load_chunk_config
 
 voting_mode = False
 voting_secret = None
 
-logging.basicConfig(filename="queueserver.log")
-stderrLogger = logging.StreamHandler()
-stderrLogger.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
+if getattr(sys, 'frozen', False):  # PyInstaller adds this attribute
+    # Running in a bundle
+    path = os.path.join(sys._MEIPASS, 'queueserver')
+else:
+    # Running in normal Python environment
+    path = os.path.dirname(__file__)
 
+# Logging
+logger = logging.getLogger('queueserver')
+logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler(filename='queueserver.log')
+console_handler = logging.StreamHandler(sys.stderr)
+formatter = logging.Formatter('[%(asctime)s %(levelname)s]: [%(name)s] %(message)s')
+console_handler.setFormatter(formatter)
+file_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
 
 class Protocol(ServerProtocol):
     def __init__(self, factory, remote_addr):
-        from versions import Version_1_15, Version_1_16, Version_1_16_2, Version_1_17, Version_1_17_1
+        from queueserver.versions import Version_1_15, Version_1_16, Version_1_16_2, Version_1_17, Version_1_17_1
         self.uuid = UUID.random()
 
         self.forwarded_uuid = None
@@ -36,6 +53,9 @@ class Protocol(ServerProtocol):
         }
 
         super(Protocol, self).__init__(factory, remote_addr)
+
+        self.logger.addHandler(console_handler)
+        self.logger.addHandler(file_handler)
 
     def packet_handshake(self, buff):
         buff2 = deepcopy(buff)
@@ -138,9 +158,9 @@ if __name__ == "__main__":
     if metrics_port is not None:
         init_prometheus(metrics_port)
 
-    config.load_chunk_config()
+    load_chunk_config()
 
     server_factory.listen(args.host, args.port)
-    print('Server started')
-    print("Listening on {}:{}".format(args.host, args.port))
+    logger.info('Server started')
+    logger.info("Listening on {}:{}".format(args.host, args.port))
     reactor.run()

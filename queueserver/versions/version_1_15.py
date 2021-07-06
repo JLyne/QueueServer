@@ -3,9 +3,9 @@ import json
 from quarry.types.nbt import TagRoot, TagCompound
 from quarry.types.uuid import UUID
 
-from versions import Version
+from queueserver.versions import Version
 
-from queueserver import Protocol
+from queueserver.server import Protocol
 
 
 class Version_1_15(Version):

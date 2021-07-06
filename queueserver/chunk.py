@@ -20,7 +20,7 @@ class Chunk:
         self.packets = list()
         self.viewpoints = list()
 
-        path = os.path.join(os.getcwd(), 'packets', folder, version, '*.bin')
+        path = os.path.join(os.getcwd(), './packets', folder, version, '*.bin')
 
         for filename in sorted(glob.glob(path)):
             file = open(filename, 'rb')

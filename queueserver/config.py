@@ -4,15 +4,11 @@ import glob
 
 from yaml import SafeLoader
 
-from chunk import Chunk
+from queueserver.chunk import Chunk
 
 import yaml
 
-from queueserver import stderrLogger
-
 logger = logging.getLogger('config')
-logger.addHandler(stderrLogger)
-logger.setLevel(logging.INFO)
 
 chunks = {
     '1.15': [],
@@ -23,7 +19,7 @@ chunks = {
 
 
 def load_chunk_config():
-    with open(r'config.yml') as file:
+    with open(r'./config.yml') as file:
         entries = yaml.load(file, Loader=SafeLoader)
 
         for entry in entries:
@@ -37,7 +33,7 @@ def load_chunk_config():
                 logger.error('Entry %s has no folder defined. Skipped.'.format(name))
                 continue
 
-            folder_path = os.path.join(os.getcwd(), 'packets', folder)
+            folder_path = os.path.join(os.getcwd(), './packets', folder)
 
             if os.path.exists(folder_path) is False:
                 logger.error('Folder for entry {} does not exist. Skipped.'.format(name))

@@ -1,5 +1,5 @@
-from versions import Version_1_17
-from queueserver import Protocol
+from queueserver.versions import Version_1_17
+from queueserver.server import Protocol
 
 
 class Version_1_17_1(Version_1_17):

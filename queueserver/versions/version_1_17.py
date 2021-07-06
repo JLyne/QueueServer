@@ -1,8 +1,8 @@
-from quarry.types.chunk import PackedArray, BlockArray
-from quarry.types.nbt import TagInt, TagRoot, TagCompound, TagList, TagLong, TagLongArray
+from quarry.types.chunk import PackedArray
+from quarry.types.nbt import TagInt, TagRoot, TagCompound, TagLongArray
 
-from versions import Version_1_16_2
-from queueserver import Protocol
+from queueserver.versions import Version_1_16_2
+from queueserver.server import Protocol
 
 
 class Version_1_17(Version_1_16_2):
