@@ -16,7 +16,7 @@ datas.extend((file, dirname(file).split("site-packages")[1]) for file in glob.ig
 datas.extend((file, dirname(file).split("site-packages")[1]) for file in glob.iglob(join(quarry_data,"**{}*.nbt".format(sep)), recursive=True))
 
 a = Analysis(['server.py'],
-             pathex=['/mnt/c/Users/jim/PycharmProjects/WaitingServer/queueserver'],
+             pathex=['/mnt/c/Users/jim/PycharmProjects/QueueServer/queueserver'],
              binaries=[],
              datas=datas,
              hiddenimports=[],
