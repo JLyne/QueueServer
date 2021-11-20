@@ -5,7 +5,7 @@ from quarry.types.uuid import UUID
 
 from queueserver.versions import Version
 
-from queueserver.server import Protocol
+from queueserver.protocol import Protocol
 
 
 class Version_1_15(Version):

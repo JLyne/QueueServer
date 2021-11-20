@@ -2,7 +2,7 @@ from quarry.types.nbt import TagList, TagCompound, TagRoot, TagString, TagByte, 
 from quarry.types.uuid import UUID
 
 from queueserver.versions import Version_1_15
-from queueserver.server import Protocol
+from queueserver.protocol import Protocol
 
 
 class Version_1_16(Version_1_15):

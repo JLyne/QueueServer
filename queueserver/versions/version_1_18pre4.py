@@ -1,19 +1,21 @@
 import os
+from pathlib import Path
 
 from quarry.types.buffer import Buffer
 from quarry.types.nbt import TagCompound, TagRoot, TagString, TagList, NBTFile, TagInt
 
 from queueserver.versions import Version_1_17_1
-from queueserver.server import Protocol, path
+from queueserver.protocol import Protocol
+from queueserver.versions.version import parent_folder
 
 
 class Version_1_18pre4(Version_1_17_1):
     protocol_version = 1073741876
     chunk_format = '1.18pre4'
 
-    biomes = NBTFile(TagRoot({})).load(os.path.join(path, 'biomes', chunk_format + '.nbt'))
+    biomes = NBTFile(TagRoot({})).load(os.path.join(parent_folder, 'biomes', chunk_format + '.nbt'))
 
-    empty_chunk_buffer = Buffer(open(os.path.join(path, 'empty_chunk', chunk_format + '.bin'), 'rb').read())
+    empty_chunk_buffer = Buffer(open(os.path.join(parent_folder, 'empty_chunk', chunk_format + '.bin'), 'rb').read())
     empty_chunk_buffer.unpack("i")
     empty_chunk_buffer.unpack("i")
 

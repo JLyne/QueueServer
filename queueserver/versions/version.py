@@ -1,12 +1,15 @@
 import abc
 import random
 import time
+from pathlib import Path
 
 from quarry.types.uuid import UUID
 
-from queueserver.server import Protocol, voting_mode, voting_secret
+from queueserver.protocol import Protocol, voting_mode, voting_secret
 from queueserver.config import chunks
 from queueserver.voting import entry_json, entry_navigation_json
+
+parent_folder = Path(__file__).parent.parent
 
 
 class Version(object, metaclass=abc.ABCMeta):
