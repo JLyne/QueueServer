@@ -10,7 +10,9 @@ quarry_data = os.path.join(split(quarry.__file__)[0], 'data')
 
 datas = [
     ( 'biomes/*.nbt', 'queueserver/biomes' ),
-    ( 'empty_chunk/*.bin', 'queueserver/empty_chunk' )
+    ( 'empty_chunk/*.bin', 'queueserver/empty_chunk' ),
+    ( 'data/1073741876_1.18pre4.csv', 'quarry/data/packets' ),
+    ( 'data/1073741876_1.18pre4.nbt', 'quarry/data/data_packs' ),
 ]
 
 datas.extend((file, dirname(file).split("site-packages")[1]) for file in glob.iglob(join(quarry_data,"**{}*.csv".format(sep)), recursive=True))
@@ -18,6 +20,7 @@ datas.extend((file, dirname(file).split("site-packages")[1]) for file in glob.ig
 
 a = Analysis(['__main__.py'],
              pathex=['.', '../venv/Lib/site-packages'],
+             #pathex=['.', '../venv-linux/Lib/python3.8/site-packages'],
              binaries=[],
              datas=datas,
              hiddenimports=[],
