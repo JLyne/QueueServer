@@ -7,11 +7,13 @@ from queueserver.server import Protocol, path
 
 
 class Version_1_18pre4(Version_1_17_1):
+    protocol_version = 1073741876
+    chunk_format = '1.18pre4'
+
+    biomes = NBTFile(TagRoot({})).load(os.path.join(path, 'biomes', chunk_format + '.nbt'))
+
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_18pre4, self).__init__(protocol, bedrock)
-        self.version_name = '1.18pre4'
-
-        self.biomes = NBTFile(TagRoot({})).load(os.path.join(path, 'biomes', '1.18pre4.nbt'))
 
     def get_dimension_settings(self):
         settings = super().get_dimension_settings()

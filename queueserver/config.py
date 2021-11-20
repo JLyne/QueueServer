@@ -10,14 +10,7 @@ import yaml
 
 logger = logging.getLogger('config')
 
-chunks = {
-    '1.15': [],
-    '1.16': [],
-    '1.16.2': [],
-    '1.17': [],
-    '1.18pre4': [],
-}
-
+chunks = {}
 
 def load_chunk_config():
     with open(r'./config.yml') as file:
@@ -42,6 +35,9 @@ def load_chunk_config():
 
             for subfolder in glob.glob(os.path.join(folder_path, '*/')):
                 version = os.path.basename(os.path.normpath(subfolder))
+
+                if chunks.get(version) is None:
+                    chunks[version] = []
 
                 if chunks.get(version) is not None:
                     chunk = Chunk(name, contributors, environment, folder, version, viewpoints)

@@ -10,6 +10,9 @@ from queueserver.voting import entry_json, entry_navigation_json
 
 
 class Version(object, metaclass=abc.ABCMeta):
+    protocol_version = None
+    chunk_format = None
+
     def __init__(self, protocol: Protocol, bedrock: False):
         self.protocol = protocol
         self.viewpoint_id = 999
@@ -25,16 +28,15 @@ class Version(object, metaclass=abc.ABCMeta):
 
         self.last_click = time.time()
 
-        self.version_name = None
         self.is_bedrock = bedrock
 
     def player_joined(self):
         self.send_join_game()
 
         if voting_mode:
-            self.current_chunk = chunks[self.version_name][0]
+            self.current_chunk = chunks[self.chunk_format][0]
         else:
-            self.current_chunk = random.choice(chunks[self.version_name])
+            self.current_chunk = random.choice(chunks[self.chunk_format])
 
         self.protocol.ticker.add_loop(100, self.send_keep_alive)  # Keep alive packets
         self.protocol.ticker.add_delay(10, self.send_tablist)
@@ -69,8 +71,8 @@ class Version(object, metaclass=abc.ABCMeta):
 
     def send_chunk(self):
         # Clear geyser chunk cache from previous server
-        if self.is_bedrock:
-            self.send_reset_world()
+        # if self.is_bedrock:
+        self.send_reset_world()
 
         self.current_viewpoint = 0
         self.send_viewpoint()
@@ -89,8 +91,8 @@ class Version(object, metaclass=abc.ABCMeta):
 
         if voting_mode:
             self.send_chat_message(entry_json(
-                chunks[self.version_name].index(self.current_chunk) + 1,
-                                          len(chunks[self.version_name])))
+                chunks[self.chunk_format].index(self.current_chunk) + 1,
+                                          len(chunks[self.chunk_format])))
         # Credits
         self.send_chat_message(self.current_chunk.credit_json())
 
@@ -156,29 +158,29 @@ class Version(object, metaclass=abc.ABCMeta):
         self.send_respawn()
 
     def next_chunk(self):
-        if len(chunks[self.version_name]) > 1:
-            index = chunks[self.version_name].index(self.current_chunk)
-            next_index = index + 1 if index < len(chunks[self.version_name]) - 1 else 0
-            self.current_chunk = chunks[self.version_name][next_index]
+        if len(chunks[self.chunk_format]) > 1:
+            index = chunks[self.chunk_format].index(self.current_chunk)
+            next_index = index + 1 if index < len(chunks[self.chunk_format]) - 1 else 0
+            self.current_chunk = chunks[self.chunk_format][next_index]
 
         self.reset_chunk()
         self.send_chunk()
 
     def previous_chunk(self):
-        if len(chunks[self.version_name]) > 1:
-            index = chunks[self.version_name].index(self.current_chunk)
-            prev_index = index - 1 if index > 0 else len(chunks[self.version_name]) - 1
-            self.current_chunk = chunks[self.version_name][prev_index]
+        if len(chunks[self.chunk_format]) > 1:
+            index = chunks[self.chunk_format].index(self.current_chunk)
+            prev_index = index - 1 if index > 0 else len(chunks[self.chunk_format]) - 1
+            self.current_chunk = chunks[self.chunk_format][prev_index]
 
         self.reset_chunk()
         self.send_chunk()
 
     def random_chunk(self):
-        if len(chunks[self.version_name]) > 1:
+        if len(chunks[self.chunk_format]) > 1:
             current_chunk = self.current_chunk
 
             while current_chunk == self.current_chunk:
-                self.current_chunk = random.choice(chunks[self.version_name])
+                self.current_chunk = random.choice(chunks[self.chunk_format])
 
         self.reset_chunk()
         self.send_chunk()

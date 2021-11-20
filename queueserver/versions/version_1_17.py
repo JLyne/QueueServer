@@ -6,9 +6,11 @@ from queueserver.server import Protocol
 
 
 class Version_1_17(Version_1_16_2):
+    protocol_version = 755
+    chunk_format = '1.17'
+
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_17, self).__init__(protocol, bedrock)
-        self.version_name = '1.17'
 
     def get_dimension_settings(self):
         settings = super().get_dimension_settings()
