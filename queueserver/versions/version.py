@@ -74,8 +74,8 @@ class Version(object, metaclass=abc.ABCMeta):
 
     def send_chunk(self):
         # Clear geyser chunk cache from previous server
-        # if self.is_bedrock:
-        self.send_reset_world()
+        if self.is_bedrock:
+            self.send_reset_world()
 
         self.current_viewpoint = 0
         self.send_viewpoint()
