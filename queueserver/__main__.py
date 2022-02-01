@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 
@@ -24,10 +23,10 @@ parser.add_argument("-a", "--host", default="127.0.0.1", help="bind address")
 parser.add_argument("-p", "--port", default=25567, type=int, help="bind port")
 parser.add_argument("-m", "--max", default=65535, type=int, help="player count")
 parser.add_argument("-r", "--metrics", default=None, type=int, help="expose prometheus metrics on specified port")
-parser.add_argument("-v", "--voting", action='store_true',
-                    help="puts server in 'voting' mode - shows entry counts and prev/next buttons")
-parser.add_argument("-s", "--secret", type=str,
-                    help="Shared secret for voting url HMAC")
+parser.add_argument("-s", "--voting", type=str,
+                    help="Enables voting mode with the given secret. Shows entry counts and prev/next buttons.")
+parser.add_argument("-b", "--bungeecord", action='store_true', help="Enables bungeecord forwarding support")
+parser.add_argument("-v", "--velocity", default=None, type=str, help="enable velocity modern forwarding support with the given secret")
 
 args = parser.parse_args()
 
@@ -39,19 +38,27 @@ server_factory.online_mode = False
 server_factory.compression_threshold = 5646848
 
 metrics_port = args.metrics
+voting_secret = args.voting
 
-voting_mode = args.voting
-voting_secret = args.secret
-
-if voting_mode is True and voting_secret is None:
-    logging.getLogger('main').error("You must provide a secret (-s) to use voting mode. Exiting.")
+if args.bungeecord is True and args.velocity is True:
+    logger.error("Cannot use both bungeecord and velocity forwarding at the same time.")
     exit(1)
+
+if args.velocity is True:
+    logger.info('Enabling Velocity forwarding support')
+
+if args.bungeecord is True:
+    logger.info('Enabling Bungeecord forwarding support')
+
+load_chunk_config()
+build_versions()
 
 if metrics_port is not None:
     init_prometheus(metrics_port)
 
-load_chunk_config()
-build_versions()
+Protocol.bungee_forwarding = args.bungeecord
+Protocol.velocity_forwarding = args.velocity is not None
+Protocol.velocity_forwarding_secret = args.velocity
 
 server_factory.listen(args.host, args.port)
 logger.info('Server started')
