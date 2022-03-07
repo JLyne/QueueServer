@@ -5,12 +5,17 @@ import glob
 from yaml import SafeLoader
 
 from queueserver.chunk import Chunk
+from queueserver.log import file_handler, console_handler
 
 import yaml
 
 logger = logging.getLogger('config')
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
+logger.setLevel(logging.DEBUG)
 
 chunks = {}
+
 
 def load_chunk_config():
     with open(r'./config.yml') as file:
