@@ -1,6 +1,4 @@
 import os
-import sys
-from pathlib import Path
 
 from quarry.types.nbt import TagList, TagCompound, TagRoot, TagString, TagByte, TagFloat, TagInt, NBTFile
 from quarry.types.uuid import UUID
@@ -14,11 +12,17 @@ class Version_1_16_2(Version_1_16):
     protocol_version = 751
     chunk_format = '1.16.2'
 
-    biomes = NBTFile(TagRoot({})).load(os.path.join(parent_folder, 'biomes', chunk_format + '.nbt'))
+    biomes = None
 
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_16_2, self).__init__(protocol, bedrock)
 
+        self.dimension_settings = None
+        self.dimension = None
+        self.dimension_codec = None
+        self.current_dimension = None
+
+    def init_dimension_codec(self):
         self.dimension_settings = self.get_dimension_settings()
 
         self.dimension = {
@@ -29,6 +33,18 @@ class Version_1_16_2(Version_1_16):
 
         self.current_dimension = TagRoot({
             '': TagCompound(self.dimension_settings),
+        })
+
+        self.dimension_codec = TagRoot({
+            '': TagCompound({
+                'minecraft:dimension_type': TagCompound({
+                    'type': TagString("minecraft:dimension_type"),
+                    'value': TagList([
+                        TagCompound(self.dimension)
+                    ]),
+                }),
+                'minecraft:worldgen/biome': self.__class__.get_biomes().root_tag.body
+            })
         })
 
     def get_dimension_settings(self):
@@ -50,24 +66,14 @@ class Version_1_16_2(Version_1_16):
         }
 
     def send_join_game(self):
-        codec = TagRoot({
-            '': TagCompound({
-                'minecraft:dimension_type': TagCompound({
-                    'type': TagString("minecraft:dimension_type"),
-                    'value': TagList([
-                        TagCompound(self.dimension)
-                    ]),
-                }),
-                'minecraft:worldgen/biome': self.biomes.root_tag.body
-            })
-        })
+        self.init_dimension_codec()
 
         self.protocol.send_packet("join_game",
                                   self.protocol.buff_type.pack("i?BB", 0, False, 1, 1),
                                   self.protocol.buff_type.pack_varint(2),
                                   self.protocol.buff_type.pack_string("rtgame:queue"),
                                   self.protocol.buff_type.pack_string("rtgame:reset"),
-                                  self.protocol.buff_type.pack_nbt(codec),
+                                  self.protocol.buff_type.pack_nbt(self.dimension_codec),
                                   self.protocol.buff_type.pack_nbt(self.current_dimension),
                                   self.protocol.buff_type.pack_string("rtgame:queue"),
                                   self.protocol.buff_type.pack("q", 0),
@@ -76,6 +82,8 @@ class Version_1_16_2(Version_1_16):
                                   self.protocol.buff_type.pack("????", False, True, False, False))
 
     def send_respawn(self):
+        self.init_dimension_codec()
+
         self.protocol.send_packet("respawn",
                                   self.protocol.buff_type.pack_nbt(self.current_dimension),
                                   self.protocol.buff_type.pack_string("rtgame:reset"),
@@ -96,3 +104,10 @@ class Version_1_16_2(Version_1_16):
                                   self.protocol.buff_type.pack_string(message),
                                   self.protocol.buff_type.pack("b", 1),
                                   self.protocol.buff_type.pack_uuid(UUID(int=0)))
+
+    @classmethod
+    def get_biomes(cls):
+        if cls.biomes is None:
+            cls.biomes = NBTFile(TagRoot({})).load(os.path.join(parent_folder, 'biomes', cls.chunk_format + '.nbt'))
+
+        return cls.biomes
