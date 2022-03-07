@@ -95,7 +95,7 @@ class Version(object, metaclass=abc.ABCMeta):
         if self.protocol.voting_mode:
             self.send_chat_message(entry_json(
                 chunks[self.chunk_format].index(self.current_chunk) + 1,
-                                          len(chunks[self.chunk_format])))
+                len(chunks[self.chunk_format])))
         # Credits
         self.send_chat_message(self.current_chunk.credit_json())
 

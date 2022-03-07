@@ -26,7 +26,8 @@ parser.add_argument("-r", "--metrics", default=None, type=int, help="expose prom
 parser.add_argument("-s", "--voting", type=str,
                     help="Enables voting mode with the given secret. Shows entry counts and prev/next buttons.")
 parser.add_argument("-b", "--bungeecord", action='store_true', help="Enables bungeecord forwarding support")
-parser.add_argument("-v", "--velocity", default=None, type=str, help="enable velocity modern forwarding support with the given secret")
+parser.add_argument("-v", "--velocity", default=None, type=str,
+                    help="enable velocity modern forwarding support with the given secret")
 
 args = parser.parse_args()
 
