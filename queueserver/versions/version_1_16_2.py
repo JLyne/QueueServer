@@ -48,7 +48,7 @@ class Version_1_16_2(Version_1_16):
         })
 
     def get_dimension_settings(self):
-        return {
+        settings = {
             'name': TagString("minecraft:overworld"),
             'natural': TagByte(1),
             'ambient_light': TagFloat(0),
@@ -64,6 +64,11 @@ class Version_1_16_2(Version_1_16):
             'logical_height': TagInt(256),
             'coordinate_scale': TagFloat(1.0),
         }
+
+        if self.current_chunk.time is not None and self.current_chunk.cycle is False:
+            settings['fixed_time'] = TagInt(self.current_chunk.time)
+
+        return settings
 
     def send_join_game(self):
         self.init_dimension_codec()
@@ -111,3 +116,7 @@ class Version_1_16_2(Version_1_16):
             cls.biomes = NBTFile(TagRoot({})).load(os.path.join(parent_folder, 'biomes', cls.chunk_format + '.nbt'))
 
         return cls.biomes
+
+    def send_time(self):
+        if self.current_chunk.cycle is True:
+            super().send_time()
