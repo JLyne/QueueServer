@@ -8,9 +8,6 @@ from quarry.types.uuid import UUID
 from queueserver.log import console_handler, file_handler, logger
 from queueserver.prometheus import set_players_online
 
-voting_mode = False
-voting_secret = None
-
 versions = {}
 
 
@@ -18,6 +15,8 @@ class Protocol(ServerProtocol):
     bungee_forwarding = False
     velocity_forwarding = False
     velocity_forwarding_secret = None
+    voting_mode = False
+    voting_secret = None
 
     def __init__(self, factory, remote_addr):
         super(Protocol, self).__init__(factory, remote_addr)

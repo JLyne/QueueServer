@@ -38,7 +38,6 @@ server_factory.online_mode = False
 server_factory.compression_threshold = 5646848
 
 metrics_port = args.metrics
-voting_secret = args.voting
 
 if args.bungeecord is True and args.velocity is True:
     logger.error("Cannot use both bungeecord and velocity forwarding at the same time.")
@@ -56,6 +55,8 @@ build_versions()
 if metrics_port is not None:
     init_prometheus(metrics_port)
 
+Protocol.voting_mode = args.voting is not None
+Protocol.voting_secret = args.voting
 Protocol.bungee_forwarding = args.bungeecord
 Protocol.velocity_forwarding = args.velocity is not None
 Protocol.velocity_forwarding_secret = args.velocity

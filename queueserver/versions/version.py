@@ -5,7 +5,7 @@ from pathlib import Path
 
 from quarry.types.uuid import UUID
 
-from queueserver.protocol import Protocol, voting_mode, voting_secret
+from queueserver.protocol import Protocol
 from queueserver.config import chunks
 from queueserver.voting import entry_json, entry_navigation_json
 
@@ -34,24 +34,24 @@ class Version(object, metaclass=abc.ABCMeta):
         self.is_bedrock = bedrock
 
     def player_joined(self):
-        self.send_join_game()
+        self.protocol.ticker.add_loop(100, self.send_keep_alive)  # Keep alive packets
 
-        if voting_mode:
+        if self.protocol.voting_mode:
             self.current_chunk = chunks[self.chunk_format][0]
         else:
             self.current_chunk = random.choice(chunks[self.chunk_format])
 
-        self.protocol.ticker.add_loop(100, self.send_keep_alive)  # Keep alive packets
-        self.protocol.ticker.add_delay(10, self.send_tablist)
-
+        self.send_join_game()
         self.send_inventory()
         self.send_chunk()
+
+        self.protocol.ticker.add_delay(10, self.send_tablist)
 
     # Handle /next and /orev commands in voting mode
     def packet_chat_message(self, buff):
         message = buff.unpack_string()
 
-        if voting_mode is False:
+        if self.protocol.voting_mode is False:
             return
 
         if message == "/prev":
@@ -92,15 +92,15 @@ class Version(object, metaclass=abc.ABCMeta):
         else:
             self.send_time()
 
-        if voting_mode:
+        if self.protocol.voting_mode:
             self.send_chat_message(entry_json(
                 chunks[self.chunk_format].index(self.current_chunk) + 1,
                                           len(chunks[self.chunk_format])))
         # Credits
         self.send_chat_message(self.current_chunk.credit_json())
 
-        if voting_mode and not self.is_bedrock:
-            self.send_chat_message(entry_navigation_json(self.protocol.uuid, voting_secret))
+        if self.protocol.voting_mode and not self.is_bedrock:
+            self.send_chat_message(entry_navigation_json(self.protocol.uuid, self.protocol.voting_secret))
 
     def send_viewpoint(self):
         viewpoint = self.current_chunk.viewpoints[self.current_viewpoint]
@@ -146,7 +146,7 @@ class Version(object, metaclass=abc.ABCMeta):
         elif self.current_viewpoint < count - 1:
             self.current_viewpoint += 1
             self.send_viewpoint()
-        elif voting_mode:
+        elif self.protocol.voting_mode:
             self.current_viewpoint = 0
             self.send_viewpoint()
         else:
