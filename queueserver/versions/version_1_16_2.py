@@ -1,18 +1,14 @@
-import os
-
-from quarry.types.nbt import TagList, TagCompound, TagRoot, TagString, TagByte, TagFloat, TagInt, NBTFile
+from quarry.data.data_packs import data_packs
+from quarry.types.nbt import TagList, TagCompound, TagRoot, TagString, TagByte, TagFloat, TagInt
 from quarry.types.uuid import UUID
 
 from queueserver.versions import Version_1_16
 from queueserver.protocol import Protocol
-from queueserver.versions.version import parent_folder
 
 
 class Version_1_16_2(Version_1_16):
     protocol_version = 751
     chunk_format = '1.16.2'
-
-    biomes = None
 
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_16_2, self).__init__(protocol, bedrock)
@@ -35,16 +31,13 @@ class Version_1_16_2(Version_1_16):
             '': TagCompound(self.dimension_settings),
         })
 
-        self.dimension_codec = TagRoot({
-            '': TagCompound({
-                'minecraft:dimension_type': TagCompound({
-                    'type': TagString("minecraft:dimension_type"),
-                    'value': TagList([
-                        TagCompound(self.dimension)
-                    ]),
-                }),
-                'minecraft:worldgen/biome': self.__class__.get_biomes().root_tag.body
-            })
+        self.dimension_codec = data_packs[self.protocol_version]
+
+        self.dimension_codec.body.value['minecraft:dimension_type'] = TagCompound({
+            'type': TagString("minecraft:dimension_type"),
+            'value': TagList([
+                TagCompound(self.dimension)
+            ]),
         })
 
     def get_dimension_settings(self):
@@ -109,13 +102,6 @@ class Version_1_16_2(Version_1_16):
                                   self.protocol.buff_type.pack_string(message),
                                   self.protocol.buff_type.pack("b", 1),
                                   self.protocol.buff_type.pack_uuid(UUID(int=0)))
-
-    @classmethod
-    def get_biomes(cls):
-        if cls.biomes is None:
-            cls.biomes = NBTFile(TagRoot({})).load(os.path.join(parent_folder, 'biomes', cls.chunk_format + '.nbt'))
-
-        return cls.biomes
 
     def send_time(self):
         if self.current_chunk.cycle is True:
