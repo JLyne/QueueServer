@@ -47,16 +47,21 @@ class Version(object, metaclass=abc.ABCMeta):
 
         self.protocol.ticker.add_delay(10, self.send_tablist)
 
-    # Handle /next and /orev commands in voting mode
     def packet_chat_message(self, buff):
         message = buff.unpack_string()
+        buff.read()
 
+        if message[0] == "/":
+            self.handle_command(message[0:])
+
+    # Handle /next and /prev commands in voting mode
+    def handle_command(self, command: str):
         if self.protocol.voting_mode is False:
             return
 
-        if message == "/prev":
+        if command == "prev":
             self.previous_chunk()
-        elif message == "/next":
+        elif command == "next":
             self.next_chunk()
 
     def packet_animation(self, buff):
