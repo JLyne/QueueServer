@@ -25,13 +25,16 @@ jobs:
         source: queueserver/dist/linux/amd64/server
         target: server
 
+    - name: Tar packets
+      run: tar -cvf packets.tar packets
+
     - uses: actions/upload-artifact@v3
       with:
         if-no-files-found: error
         name: queueserver-linux
         path: |
           server
-          packets
+          packets.tar
           config.yml
         
   build-windows:
@@ -52,11 +55,14 @@ jobs:
         source: queueserver/dist/windows/win64/server.exe
         target: server.exe
 
+    - name: Tar packets
+      run: tar -cvf packets.tar packets
+
     - uses: actions/upload-artifact@v3
       with:
         if-no-files-found: error
         name: queueserver-windows
         path: |
           server.exe
-          packets
+          packets.tar
           config.yml
