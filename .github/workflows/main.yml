@@ -15,14 +15,14 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Package Application
-      uses: JackMcKew/pyinstaller-action-linux@main
+      uses: action-python/pyinstaller-py3.8@amd64
       with:
         path: queueserver
         
     - name: copy file
       uses: canastro/copy-file-action@master
       with:
-        source: queueserver/dist/linux/server
+        source: queueserver/dist/linux/amd64/server
         target: server
 
     - uses: actions/upload-artifact@v2
@@ -42,14 +42,14 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Package Application
-      uses: JackMcKew/pyinstaller-action-windows@main
+      uses: action-python/pyinstaller-py3.8@win64
       with:
         path: queueserver
         
     - name: copy file
       uses: canastro/copy-file-action@master
       with:
-        source: queueserver/dist/windows/server.exe
+        source: queueserver/dist/windows/win64/server.exe
         target: server.exe
 
     - uses: actions/upload-artifact@v2
