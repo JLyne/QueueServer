@@ -11,8 +11,8 @@ class Version_1_18(Version_1_17_1):
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_18, self).__init__(protocol, bedrock)
 
-    def get_dimension_settings(self):
-        settings = super().get_dimension_settings()
+    def get_dimension_settings(self, name: str):
+        settings = super().get_dimension_settings(name)
 
         settings['min_y'] = TagInt(-64)
         settings['height'] = TagInt(384)
@@ -28,7 +28,7 @@ class Version_1_18(Version_1_17_1):
                                   self.protocol.buff_type.pack_string("rtgame:queue"),
                                   self.protocol.buff_type.pack_string("rtgame:reset"),
                                   self.protocol.buff_type.pack_nbt(self.dimension_codec),
-                                  self.protocol.buff_type.pack_nbt(self.current_dimension),
+                                  self.protocol.buff_type.pack_nbt(self.dimension_settings[self.current_chunk.dimension]),
                                   self.protocol.buff_type.pack_string("rtgame:queue"),
                                   self.protocol.buff_type.pack("q", 0),
                                   self.protocol.buff_type.pack_varint(0),

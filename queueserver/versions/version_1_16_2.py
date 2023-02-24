@@ -13,36 +13,35 @@ class Version_1_16_2(Version_1_16):
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_16_2, self).__init__(protocol, bedrock)
 
-        self.dimension_settings = None
-        self.dimension = None
         self.dimension_codec = None
         self.current_dimension = None
 
     def init_dimension_codec(self):
-        self.dimension_settings = self.get_dimension_settings()
-
-        self.dimension = {
-            'name': TagString("minecraft:overworld"),
-            'id': TagInt(0),
-            'element': TagCompound(self.dimension_settings),
-        }
-
-        self.current_dimension = TagRoot({
-            '': TagCompound(self.dimension_settings),
-        })
-
         self.dimension_codec = data_packs[self.protocol_version]
 
         self.dimension_codec.body.value['minecraft:dimension_type'] = TagCompound({
             'type': TagString("minecraft:dimension_type"),
             'value': TagList([
-                TagCompound(self.dimension)
+                TagCompound({
+                    'name': TagString("minecraft:overworld"),
+                    'id': TagInt(0),
+                    'element': TagCompound(self.get_dimension_settings("overworld")),
+                }),
+                TagCompound({
+                    'name': TagString("minecraft:nether"),
+                    'id': TagInt(1),
+                    'element': TagCompound(self.get_dimension_settings("nether")),
+                }),
+                TagCompound({
+                    'name': TagString("minecraft:the_end"),
+                    'id': TagInt(2),
+                    'element': TagCompound(self.get_dimension_settings("the_end")),
+                })
             ]),
         })
 
-    def get_dimension_settings(self):
+    def get_dimension_settings(self, name: str):
         settings = {
-            'name': TagString("minecraft:overworld"),
             'natural': TagByte(1),
             'ambient_light': TagFloat(0),
             'has_ceiling': TagByte(0),
@@ -52,14 +51,11 @@ class Version_1_16_2(Version_1_16):
             'respawn_anchor_works': TagByte(0),
             'bed_works': TagByte(1),
             'piglin_safe': TagByte(0),
-            'infiniburn': TagString("minecraft:infiniburn_overworld"),
-            "effects": TagString("minecraft:overworld"),
+            'infiniburn': TagString("minecraft:infiniburn_{}".format(name)),
+            "effects": TagString("minecraft:{}".format(name)),
             'logical_height': TagInt(256),
             'coordinate_scale': TagFloat(1.0),
         }
-
-        if self.current_chunk.time is not None and self.current_chunk.cycle is False:
-            settings['fixed_time'] = TagInt(self.current_chunk.time)
 
         return settings
 
@@ -102,7 +98,3 @@ class Version_1_16_2(Version_1_16):
                                   self.protocol.buff_type.pack_string(message),
                                   self.protocol.buff_type.pack("b", 1),
                                   self.protocol.buff_type.pack_uuid(UUID(int=0)))
-
-    def send_time(self):
-        if self.current_chunk.cycle is True:
-            super().send_time()

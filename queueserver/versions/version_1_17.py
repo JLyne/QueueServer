@@ -11,8 +11,8 @@ class Version_1_17(Version_1_16_2):
     def __init__(self, protocol: Protocol, bedrock: False):
         super(Version_1_17, self).__init__(protocol, bedrock)
 
-    def get_dimension_settings(self):
-        settings = super().get_dimension_settings()
+    def get_dimension_settings(self, name: str):
+        settings = super().get_dimension_settings(name)
 
         settings['min_y'] = TagInt(0)
         settings['height'] = TagInt(256)

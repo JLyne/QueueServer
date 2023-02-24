@@ -13,7 +13,7 @@ class Chunk:
         self.contributors = contributors
 
         self.time = environment.get('time', 0)
-        self.dimension = environment.get('dimension', 'Overworld')
+        self.dimension = "minecraft:{}".format(environment.get('dimension', 'overworld'))
         self.weather = environment.get('weather', 'clear')
         self.cycle = environment.get('cycle', False)
 
